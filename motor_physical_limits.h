@@ -1,0 +1,27 @@
+#define HEAD_MOTOR_LOW_VALUE 		1698		//Motor ID 11
+#define HEAD_MOTOR_HIGH_VALUE 		330
+
+#define NECK_MOTOR_LOW_VALUE		2846		//Motor ID 12
+#define NECK_MOTOR_HIGH_VALUE 		818
+
+#define LA_SHOULDER_TIP_LOW		1906		//Motor ID 21
+#define LA_SHOULDER_TIP_HIGH		1025
+
+#define LA_SHOULDER_LOW			2613		//Motor ID 22
+#define LA_SHOULDER_HIGH 		0		
+
+#define LA_ELBOW_LOW			1925		//Motor ID 24
+#define LA_ELBOW_HIGH			3162		
+
+#define RA_SHOULDER_TIP_LOW		2062		//Motor ID 31
+#define RA_SHOULDER_TIP_HIGH		2891
+
+#define RA_SHOULDER_LOW			1594		//Motor ID 32
+#define RA_SHOULDER_HIGH 		0		
+
+#define RA_ELBOW_LOW			2024		//Motor ID 34
+#define RA_ELBOW_HIGH			729		
+
+#define WAIST_LOW_VALUE 		64936		//Motor ID 43
+#define WASIT_HIGH_VALUE 		3689
+

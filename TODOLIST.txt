@@ -1,0 +1,19 @@
+How to Compile if you're on the Robot Comp (Tough luck if you're at home)
+g++ read_motor_position.cpp -I$HOME/Downloads/DynamixelSDK/c++/build/linux64 -L/opt/lib -l dxl_x64_cpp -o read_motor_position
+
+(Since the Dynamixel SDK is a shared object not in the same file and I couldn't be bothered to mess with the Make Files at this time)
+
+First Push:
+-Adapted DynamixelSDK examples to read present values of motors 
+-Communication with motors and "physical limits" established
+
+January 2nd:
+-Successful writes to Head Motor and movement with button presses
+-Defined phyiscal limits in file for ease of use
+
+MAJOR TO DO LIST:
+-CLEAN UP THE CODE AND MODULARIZE IT
+-Write functions and/or classes to separate the different limbs and motors
+-Create a fake GUI for unit testing
+-Figure out how to move the cpp files to work with ROS
+
