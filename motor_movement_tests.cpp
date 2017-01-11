@@ -12,6 +12,7 @@
 
 #include "dynamixel_sdk.h"                                  // Uses Dynamixel SDK library
 #include "motor_physical_limits.h"			    // Constants for Limb Limitations
+#include "motor.h"					    // Motor Data Class
 
 //Tip of Shoulder: x1, shoulder: x2, rest goes down x3-x6, x5 is unplugged
 
@@ -60,6 +61,7 @@ int getch() {
 #endif
 }
 
+using namespace std;
 
 int main() {
 	// Initialize PortHandler instance
@@ -76,7 +78,7 @@ int main() {
   	uint8_t dxl_error = 0;                          // Dynamixel error
   	uint16_t dxl_present_position = 0;              // Present position
 	uint16_t dxl_current_speed = 40;		// Present moving speed
-	bool lowLimit = false;	
+	bool lowLimit = false;				// 
 
   	// Open port
   	if (portHandler->openPort())
@@ -100,25 +102,28 @@ int main() {
 	    	return 0;
   	}
 
-			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_ID[i], ADDR_MX_MOVING_SPEED_L, TEST_MOVEMENT_SPEED, &dxl_error);
-	    	if (dxl_comm_result != COMM_SUCCESS)
-	      	{
-			packetHandler->printTxRxResult(dxl_comm_result);
-	      	}
-	      	else if (dxl_error != 0)
-	      	{
-			packetHandler->printRxPacketError(dxl_error);
-	      	}
+	dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_ID[i], ADDR_MX_MOVING_SPEED_L, TEST_MOVEMENT_SPEED, &dxl_error);
+	    	
+	if (dxl_comm_result != COMM_SUCCESS){
+		packetHandler->printTxRxResult(dxl_comm_result);
+	}
+
+	else if (dxl_error != 0){
+		packetHandler->printRxPacketError(dxl_error);
+	}
 
   	while(1) {
   		// read present position
-  		int value = getch();
+		/*  		
+		int value = getch();
       		if (value == UP_ASCII_VALUE)
   			i++;
   		if (value == DOWN_ASCII_VALUE)
   			i--;
   		//i = abs(i%15);
-		i = 0;
+		*/
+		//test
+		whichMotor(i); 
   		
   		dxl_comm_result = packetHandler->read2ByteTxRx(portHandler, dxl_ID[i], ADDR_MX_PRESENT_POSITION, &dxl_present_position, &dxl_error);
 	    	if (dxl_comm_result != COMM_SUCCESS)
@@ -170,3 +175,27 @@ int main() {
   	return 0;
 }
 
+
+
+/* Broken code; mainly just used for testing for now */
+void whichMotor(int &value){
+
+	cout << "Choose which motor you want to test: " << endl;
+	cout << "Motors: " << endl;
+	cout << "ID 11: Head Motor || PRESS 1" << endl;
+	cout << "ID 12: Neck Motor || PRESS 2" << endl;
+	cout << "ID 21: Left Arm Shoulder Tip Motor || PRESS 3" << endl;
+	cout << "ID 22: Left Arm Shoulder Motor || PRESS 4" << endl;
+	cout << "ID 24: Left Arm Elbow Motor || PRESS 5" << endl;
+	cout << "ID 31: Right Arm Shoulder Tip Motor || PRESS 6" << endl;
+	cout << "ID 32: Right Arm Shoulder Motor || PRESS 7" << endl;
+	cout << "ID 34: Right Arm Elbow Motor || PRESS 8" << endl;
+	cout << "ID 43: Waist Motor || PRESS 9" << endl;	
+
+	value = getch();	
+}
+
+
+void init(){
+
+} 
