@@ -1,26 +1,28 @@
 #ifndef MOTOR_H_
 #define MOTOR_H_
 
-#include <string>
+#include <stdint.h>
 
-template<typename T>
 class Motor{
 	
 private:
-	String model;
 	int id;
 
-	T position_limit_low;
-	T position_limit_high;
+	uint16_t position_limit_low;
+	uint16_t position_limit_high;
 
 
 	//might have to add speed limits too
 
 public:
-	Motor(T low, T high);
+	Motor();
+	Motor(uint16_t low, uint16_t high, int id);
 	~Motor();
 
-	bool atALimit(T current);
-}
+	bool atLowLimit(uint16_t current);
+	uint16_t getLowLimit();
+	uint16_t getHighLimit();
+	int getID();
+};
 
 #endif
