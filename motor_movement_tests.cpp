@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "dynamixel_sdk.h"                                  // Uses Dynamixel SDK library
 #include "motor_physical_limits.h"			    // Constants for Limb Limitations
@@ -38,7 +39,7 @@
 #define DXL_MINIMUM_POSITION_VALUE      0                 // Dynamixel will rotate between this value
 #define DXL_MAXIMUM_POSITION_VALUE      4095                // and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
 
-#define TEST_MOVEMENT_SPEED 		20
+#define TEST_MOVEMENT_SPEED 		30
 #define DXL_MOVING_STATUS_THRESHOLD     5                  // Dynamixel moving status threshold
 
 #define UP_ASCII_VALUE                 0x77
@@ -46,29 +47,36 @@
 #define PRINT_ASCII_VALUE				0x7a
 int i = 0;
 
+using namespace std;
+
 int getch() {
 #ifdef __linux__
-  	struct termios oldt, newt;
-  	int ch;
-  	tcgetattr(STDIN_FILENO, &oldt);
-  	newt = oldt;
-  	newt.c_lflag &= ~(ICANON | ECHO);
-  	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  	ch = getchar();
-  	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  	return ch;
-#elif defined(_WIN32) || defined(_WIN64)
-  	return _getch();
+  	char buf=0;
+    struct termios old={0};
+    fflush(stdout);
+    if(tcgetattr(0, &old)<0)
+        perror("tcsetattr()");
+    old.c_lflag&=~ICANON;
+    old.c_lflag&=~ECHO;
+    old.c_cc[VMIN]=1;
+    old.c_cc[VTIME]=0;
+    if(tcsetattr(0, TCSANOW, &old)<0)
+        perror("tcsetattr ICANON");
+    if(read(0,&buf,1)<0)
+        perror("read()");
+    old.c_lflag|=ICANON;
+    old.c_lflag|=ECHO;
+    if(tcsetattr(0, TCSADRAIN, &old)<0)
+        perror ("tcsetattr ~ICANON");
+    printf("%c\n",buf);
+    return buf;
 #endif
 }
-
-using namespace std;
 
 vector<Motor> motors;
 vector<Motor>::iterator Iterator;
 
-/* Broken code; mainly just used for testing for now */
-void whichMotor(int &value) {
+void displayMenu() {
 	cout << "Choose which motor you want to test: " << endl;
 	cout << "Motors: " << endl;
 	cout << "ID 11: Head Motor || PRESS 1" << endl;
@@ -82,51 +90,46 @@ void whichMotor(int &value) {
 	cout << "ID 43: Waist Motor || PRESS 9" << endl;	
 	cout << "OTHER OPTIONS: " << endl;
 	cout << "Q to quit the simulation." <<endl;
-	
+}
+
+/* Broken code; mainly just used for testing for now */
+int whichMotor(int input) {
+	switch(input) {
+	 	case 49 : return 11;
+		case 50 : return 12;
+		case 51 : return 21;
+		case 52 : return 22;
+		case 53 : return 24;
+		case 54 : return 31;
+		case 55 : return 32;
+		case 56 : return 34;
+		//case 57 : return 43;
+		default : cout << "Invalid input. Fuck my ass." << endl; return 0;
+	}		
+}
+
+bool keepThisMotor(){
+	cout << "Do you want to continue testing this motor?" <<endl;
+	cout << "Y for yes." <<endl;
+	cout << "Any other input will assume that you want to change the motor selected." << endl;
+
 	int input = getch();
 
 	switch(input) {
-	 	case 49 : value = 11;
+		case 121 : return true;
 			break;
-		case 50 : value = 12;
+		case 89 : return true;
 			break;
-		case 51 : value = 21;
-			break;
-		case 52 : value = 22;
-			break;
-		case 53 : value = 24;
-			break;
-		case 54 : value = 31;
-			break;
-		case 55 : value = 32;
-			break;
-		case 56 : value = 34;
-			break;
-		case 57 : value = 43;
-			break;
-		default : cout << "Invalid input. Fuck my ass." << endl;
+		default : return false;
 			break;
 	}
 }
 
-int main() {
-	// Initialize PortHandler instance
-  	// Set the port path
-  	// Get methods and members of PortHandlerLinux or PortHandlerWindows
-  	dynamixel::PortHandler *portHandler = dynamixel::PortHandler::getPortHandler(DEVICENAME);
+void init() {
 
-  	// Initialize PacketHandler instance
-  	// Set the protocol version
-  	// Get methods and members of Protocol1PacketHandler or Protocol2PacketHandler
-  	dynamixel::PacketHandler *packetHandler = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION);
-  	
-  	int dxl_comm_result = COMM_TX_FAIL;             // Communication result
-  	uint8_t dxl_error = 0;                          // Dynamixel error
-  	uint16_t dxl_present_position = 0;              // Present position
-	uint16_t dxl_current_speed = 40;		// Present moving speed
-	bool lowLimit = true;				// For motor physical limitations
-	bool motorChosen = false;			// For choosing an initial motor 
+}
 
+void setupMotors() {
 	/* Hacky motor declarations for now; might change it to a data structure in the future */
 	// To Do: Add Motor 23 and 33 for testing purposes later
 	Motor motorHead = Motor(HEAD_MOTOR_LOW_VALUE, HEAD_MOTOR_HIGH_VALUE, 11);
@@ -153,11 +156,34 @@ int main() {
 	Motor motorRAE = Motor(RA_ELBOW_LOW, RA_ELBOW_HIGH, 34);
 	motors.push_back(motorRAE);
 
-	Motor motorWaist= Motor(WAIST_LOW_VALUE, WAIST_HIGH_VALUE, 43);
-	motors.push_back(motorWaist);
+	//Motor motorWaist= Motor(WAIST_LOW_VALUE, WAIST_HIGH_VALUE, 43);
+	//motors.push_back(motorWaist);
+}
 
+int main() {
+	//init();
+
+	// Initialize PortHandler instance
+  	// Set the port path
+  	// Get methods and members of PortHandlerLinux or PortHandlerWindows
+  	dynamixel::PortHandler *portHandler = dynamixel::PortHandler::getPortHandler(DEVICENAME);
+
+  	// Initialize PacketHandler instance
+  	// Set the protocol version
+  	// Get methods and members of Protocol1PacketHandler or Protocol2PacketHandler
+  	dynamixel::PacketHandler *packetHandler = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION);
+  	
+  	int dxl_comm_result = COMM_TX_FAIL;             // Communication result
+  	uint8_t dxl_error = 0;                          // Dynamixel error
+  	uint16_t dxl_present_position = 0;              // Present position
+	uint16_t dxl_current_speed = 40;		// Present moving speed
+	bool lowLimit = true;				// For motor physical limitations
+	bool motorChosen = false;			// For choosing an initial motor 
+
+	setupMotors();
+
+	// set default motor ID to head
 	int dxl_id = 11;
-	
 
   	// Open port
   	if (portHandler->openPort())
@@ -178,21 +204,26 @@ int main() {
 
 	int i = 0;
 	Motor chosen;
+
   	while(1) {
 		while(!motorChosen) {
-			whichMotor(i); 
+			displayMenu();
+			int i = whichMotor(getch()); 
 			for(Iterator = motors.begin(); Iterator != motors.end(); Iterator++) {
 				Motor motor = *Iterator;
 				if(motor.getID() == i) {
 					chosen = motor;
+					dxl_id = chosen.getID();
+					break;
 				}
 			}
 			if (i != 0) {
 				motorChosen = true;
 			}
 
-			dxl_id = chosen.getID();
-			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_MOVING_SPEED_L, TEST_MOVEMENT_SPEED, &dxl_error);
+		}
+
+		dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_MOVING_SPEED_L, TEST_MOVEMENT_SPEED, &dxl_error);
 	    	
 		if (dxl_comm_result != COMM_SUCCESS) {
 			packetHandler->printTxRxResult(dxl_comm_result);
@@ -200,8 +231,6 @@ int main() {
 
 		else if (dxl_error != 0) {
 			packetHandler->printRxPacketError(dxl_error);
-		}
-	
 		}
 		
   		dxl_comm_result = packetHandler->read2ByteTxRx(portHandler, dxl_id, ADDR_MX_PRESENT_POSITION, &dxl_present_position, &dxl_error);
@@ -212,9 +241,10 @@ int main() {
 	    else if (dxl_error != 0) {
 			packetHandler->printRxPacketError(dxl_error);
 	    }
+
 		/*JANUARY 2ND CHANGES*/
   		if (!lowLimit) {
-			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, chosen.getLowLimit(), &dxl_error);
+			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, chosen.getLowLimit() % 4096, &dxl_error);
 		    if (dxl_comm_result != COMM_SUCCESS) {
 				packetHandler->printTxRxResult(dxl_comm_result);
 		    }
@@ -223,7 +253,7 @@ int main() {
 		    }
   		} 
 		else {
-			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, chosen.getHighLimit(), &dxl_error);
+			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, chosen.getHighLimit() % 4096, &dxl_error);
 		    if (dxl_comm_result != COMM_SUCCESS) {
 				packetHandler->printTxRxResult(dxl_comm_result);
 		    }
@@ -237,11 +267,35 @@ int main() {
   			printf("ID: %d | Present Position: %03d\n", dxl_id, dxl_present_position);
   		}
   		*/
+		
+		if(chosen.atALimit(dxl_present_position)){
+			if (lowLimit)
+				dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, (chosen.getLowLimit() % 4096) + 10, &dxl_error);
+		    	if (dxl_comm_result != COMM_SUCCESS) {
+					packetHandler->printTxRxResult(dxl_comm_result);
+		    	}
+		    	else if (dxl_error != 0) {
+					packetHandler->printRxPacketError(dxl_error);
+		    	}
+			else{
+				dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, (chosen.getHighLimit() % 4096) - 10, &dxl_error);
+		    	if (dxl_comm_result != COMM_SUCCESS) {
+					packetHandler->printTxRxResult(dxl_comm_result);
+		    	}
+		   		else if (dxl_error != 0) {
+					packetHandler->printRxPacketError(dxl_error);
+		   		}	
+			}
+		}
+
+  		// Might need to fix the logic later for this
 		if (chosen.atLowLimit(dxl_present_position))
 			lowLimit = true;
 		else
 			lowLimit = false;
-		motorChosen = false;
+
+
+		motorChosen = keepThisMotor();
   	}
 	/*JANUARY 2ND CHANGES*/
 

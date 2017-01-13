@@ -20,6 +20,7 @@ public:
 	~Motor();
 
 	bool atLowLimit(uint16_t current);
+	bool atALimit(uint16_t current);
 	uint16_t getLowLimit();
 	uint16_t getHighLimit();
 	int getID();

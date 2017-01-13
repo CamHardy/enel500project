@@ -15,7 +15,14 @@ Motor::~Motor(){
 }
 
 bool Motor::atLowLimit(uint16_t current){
-	if(current == position_limit_low)
+	if(current <= position_limit_low)
+		return true;
+	else
+		return false;
+}
+
+bool Motor::atALimit(uint16_t current){
+	if (current <= position_limit_low || current >= position_limit_high)
 		return true;
 	else
 		return false;
