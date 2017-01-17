@@ -1,8 +1,6 @@
 #include "motor.h"
 
-Motor::Motor() {
-	// lol
-}
+Motor::Motor() {}
 
 Motor::Motor(uint16_t low, uint16_t high, int id){
 	position_limit_low = low;
@@ -10,7 +8,10 @@ Motor::Motor(uint16_t low, uint16_t high, int id){
 	this->id = id;
 }
 
-Motor::~Motor(){
+Motor::~Motor() {}
+
+bool Motor::moveToPosition(uint16_t pos) {
+	// check that the position is in bounds
 
 }
 

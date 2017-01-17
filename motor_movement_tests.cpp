@@ -1,3 +1,5 @@
+// compile with g++ -std=c++11 motor_movement_tests.cpp motor.cpp -I$HOME/Downloads/DynamixelSDK/c++/build/linux64 -L/opt/lib -l dxl_x64_cpp -o motor_movement_tests
+
 #ifdef __linux__
 #include <unistd.h>
 #include <fcntl.h>
@@ -68,13 +70,13 @@ int getch() {
     old.c_lflag|=ECHO;
     if(tcsetattr(0, TCSADRAIN, &old)<0)
         perror ("tcsetattr ~ICANON");
-    printf("%c\n",buf);
+    //printf("%c\n",buf);
     return buf;
 #endif
 }
 
-vector<Motor> motors;
-vector<Motor>::iterator Iterator;
+vector<Motor *> motors;
+vector<Motor *>::iterator Iterator;
 
 void displayMenu() {
 	cout << "Choose which motor you want to test: " << endl;
@@ -104,7 +106,7 @@ int whichMotor(int input) {
 		case 55 : return 32;
 		case 56 : return 34;
 		//case 57 : return 43;
-		default : cout << "Invalid input. Fuck my ass." << endl; return 0;
+		default : cout << "Invalid input." << endl; return 0;
 	}		
 }
 
@@ -115,45 +117,36 @@ bool keepThisMotor(){
 
 	int input = getch();
 
-	switch(input) {
-		case 121 : return true;
-			break;
-		case 89 : return true;
-			break;
-		default : return false;
-			break;
-	}
+	return (input == 89 || input == 121) ? true : false;
 }
 
-void init() {
-
-}
+void init() {}
 
 void setupMotors() {
 	/* Hacky motor declarations for now; might change it to a data structure in the future */
 	// To Do: Add Motor 23 and 33 for testing purposes later
-	Motor motorHead = Motor(HEAD_MOTOR_LOW_VALUE, HEAD_MOTOR_HIGH_VALUE, 11);
+	Motor *motorHead = new Motor(HEAD_MOTOR_LOW_VALUE, HEAD_MOTOR_HIGH_VALUE, 11);
 	motors.push_back(motorHead);
 
-	Motor motorNeck = Motor(NECK_MOTOR_LOW_VALUE, NECK_MOTOR_HIGH_VALUE, 12);
+	Motor *motorNeck = new Motor(NECK_MOTOR_LOW_VALUE, NECK_MOTOR_HIGH_VALUE, 12);
 	motors.push_back(motorNeck);
 
-	Motor motorLAT = Motor(LA_SHOULDER_TIP_LOW, LA_SHOULDER_TIP_HIGH, 21);
+	Motor *motorLAT = new Motor(LA_SHOULDER_TIP_LOW, LA_SHOULDER_TIP_HIGH, 21);
 	motors.push_back(motorLAT);
 
-	Motor motorLAS = Motor(LA_SHOULDER_LOW, LA_SHOULDER_HIGH, 22);
+	Motor *motorLAS = new Motor(LA_SHOULDER_LOW, LA_SHOULDER_HIGH, 22);
 	motors.push_back(motorLAS);
 
-	Motor motorLAE = Motor(LA_ELBOW_LOW, LA_ELBOW_HIGH, 24);
+	Motor *motorLAE = new Motor(LA_ELBOW_LOW, LA_ELBOW_HIGH, 24);
 	motors.push_back(motorLAE);
 
-	Motor motorRAT = Motor(RA_SHOULDER_TIP_LOW, RA_SHOULDER_TIP_HIGH, 31);
+	Motor *motorRAT = new Motor(RA_SHOULDER_TIP_LOW, RA_SHOULDER_TIP_HIGH, 31);
 	motors.push_back(motorRAT);
 
-	Motor motorRAS = Motor(RA_SHOULDER_LOW, RA_SHOULDER_HIGH, 32);
+	Motor *motorRAS = new Motor(RA_SHOULDER_LOW, RA_SHOULDER_HIGH, 32);
 	motors.push_back(motorRAS);
 
-	Motor motorRAE = Motor(RA_ELBOW_LOW, RA_ELBOW_HIGH, 34);
+	Motor *motorRAE = new Motor(RA_ELBOW_LOW, RA_ELBOW_HIGH, 34);
 	motors.push_back(motorRAE);
 
 	//Motor motorWaist= Motor(WAIST_LOW_VALUE, WAIST_HIGH_VALUE, 43);
@@ -203,17 +196,17 @@ int main() {
   	}
 
 	int i = 0;
-	Motor chosen;
+	Motor *chosen;
 
   	while(1) {
 		while(!motorChosen) {
 			displayMenu();
 			int i = whichMotor(getch()); 
 			for(Iterator = motors.begin(); Iterator != motors.end(); Iterator++) {
-				Motor motor = *Iterator;
-				if(motor.getID() == i) {
+				Motor *motor = *Iterator;
+				if(motor->getID() == i) {
 					chosen = motor;
-					dxl_id = chosen.getID();
+					dxl_id = chosen->getID();
 					break;
 				}
 			}
@@ -244,7 +237,7 @@ int main() {
 
 		/*JANUARY 2ND CHANGES*/
   		if (!lowLimit) {
-			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, chosen.getLowLimit() % 4096, &dxl_error);
+			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, chosen->getLowLimit() % 4096, &dxl_error);
 		    if (dxl_comm_result != COMM_SUCCESS) {
 				packetHandler->printTxRxResult(dxl_comm_result);
 		    }
@@ -253,7 +246,7 @@ int main() {
 		    }
   		} 
 		else {
-			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, chosen.getHighLimit() % 4096, &dxl_error);
+			dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, chosen->getHighLimit() % 4096, &dxl_error);
 		    if (dxl_comm_result != COMM_SUCCESS) {
 				packetHandler->printTxRxResult(dxl_comm_result);
 		    }
@@ -268,9 +261,9 @@ int main() {
   		}
   		*/
 		
-		if(chosen.atALimit(dxl_present_position)){
+		if(chosen->atALimit(dxl_present_position)){
 			if (lowLimit)
-				dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, (chosen.getLowLimit() % 4096) + 10, &dxl_error);
+				dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, (chosen->getLowLimit() % 4096) + 10, &dxl_error);
 		    	if (dxl_comm_result != COMM_SUCCESS) {
 					packetHandler->printTxRxResult(dxl_comm_result);
 		    	}
@@ -278,7 +271,7 @@ int main() {
 					packetHandler->printRxPacketError(dxl_error);
 		    	}
 			else{
-				dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, (chosen.getHighLimit() % 4096) - 10, &dxl_error);
+				dxl_comm_result = packetHandler->write2ByteTxRx(portHandler, dxl_id, ADDR_MX_GOAL_POSITION, (chosen->getHighLimit() % 4096) - 10, &dxl_error);
 		    	if (dxl_comm_result != COMM_SUCCESS) {
 					packetHandler->printTxRxResult(dxl_comm_result);
 		    	}
@@ -289,7 +282,7 @@ int main() {
 		}
 
   		// Might need to fix the logic later for this
-		if (chosen.atLowLimit(dxl_present_position))
+		if (chosen->atLowLimit(dxl_present_position))
 			lowLimit = true;
 		else
 			lowLimit = false;
