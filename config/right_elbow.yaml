@@ -1,0 +1,12 @@
+right_shoulder_tip_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: right_elbow
+    joint_speed: 1.17
+    motor:
+        id: 34
+        init: 512 # change this
+        min: 2024
+        max: 729 # double check this range

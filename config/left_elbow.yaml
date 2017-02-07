@@ -1,0 +1,12 @@
+left_elbow_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: left_elbow
+    joint_speed: 1.17
+    motor:
+        id: 24
+        init: 512 # change this
+        min: 1925
+        max: 3162
