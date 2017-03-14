@@ -1,0 +1,92 @@
+Main Path: /home/capstone/catkin_ws/dynamixel_motor/dynamixel_msgs/msg
+
+Controller file (needs to be running in Terminal): 		/home/capstone/catkin_ws/dynamixel_motor/dynamixel_controllers/nodes/controller_manager.py
+Spawner File (needs to be running in seperate terminal): 	/home/capstone/catkin_ws/dynamixel_motor/dynamixel_controllers/nodes/controller_spawner.py
+File that allows you to run topics: 				/home/capstone/catkin_ws/dynamixel_motor/dynamixel_driver/src/dynamixel_driver/dynamixel_serial_proxy.py
+Sets OIs: 							/home/capstone/catkin_ws/dynamixel_motor/dynamixel_driver/src/dynamixel_driver/dynamixel_io.py
+Launcher:							/home/capstone/catkin_ws/src/capstone_test/controller_manager.launch
+Limits of Motors						/home/capstone/catkin_ws/src/capstone_test/tilt.yaml
+
+Command line Examples:
+rostopic pub -1 /blah balh blah...
+rostopic echo /blah blah blah
+
+
+Github location: 						https://github.com/arebgun/dynamixel_motor
+
+Logging into the NUC
+
+USERNAME: CAPSTONE
+Password: 4frontrobo2016
+
+Open up 2 terminals by pressing ctl+alt+t
+
+Turn on the power supply for the Motor & PC circuit
+
+you need to setup two things in order to manipulate the motors
+1) Launching the controller manager in the first terminal: roslaunch capstone_test controller_manager.launch
+In second terminal, launch: roslaunch capstone_test start_meta_controller.launch
+
+Now everything is setup and initialized and we can start to move the motors.
+
+Find topics of a specific motor: rostopic list
+
+To diagnose or view the state of a motor: rostopic echo /right_elbow_controller_state
+For testing look at > goal_pos: and current_pos: 
+
+to move the hand
+rostopic pub -1 /head_controller/command std_msg/Float 64 -- <input values>
+For a list of input values go to file Home\catkin_ws\src\temp\capstone_test\tilt.yaml
+
+every controller has a service that you can call to get a list type: rosservice list
+if you overload the motors it is a good idea to change the speed (otherwise it is really fast)
+rosservice call/head_controller/set_speed 0.5
+(0.5 is a nice slow speed)
+
+What they want us to do:
+figure out what value you put into the terminal to make it move here to here.
+
+To run a .sh file - in the second terminal enter: bash <filename>.sh
+
+Head Motor (ID: 11):
+	-Range is 4.5 to 6.28
+	-(Any lower value than 4.5 causes the motors to default to a limit)
+	-(Any higher value than 6.28 causes the motor to default to the other limit)
+
+
+Neck Motor (ID: 12):
+	-Range is 0 to 3.1
+	-Same behavior as above
+
+Left Shoulder Tip Controller (ID: 21):
+	-Range is 1.75 to 2.8
+	-init is 2.8
+ 
+Left Shoulder Controller (ID: 22):
+	-Range is -1.6 to 0.25  
+
+Left Upper Arm Controller (ID: 23):
+	- Range is -1.7 to 1.5
+	- IMPORTANT: MAKE SURE THE INITIAL POSITION IS AROUND 0!!!!! (resting is -.05 ish)
+	- You can check with rostopic echo /left_upper_arm_controller/state or just publish the topic to initialize it back to 0 if you think its not in range
+
+Left Elbow Controller (ID: 24):
+	-Range is -0.25 to 1.6
+
+Right Shoulder Tip Controller (ID: 31):
+	-Range is 0 to 1.2
+
+Right Shoulder Controller (ID: 32):
+	-Range is 0 to 1.5
+	-This causes the robot to tilt over, be careful!
+
+Right Upper Arm Controller (ID: 33):
+	-Range is -1.6 to 1.6
+	-Init is around -0.1 (0 is okay)
+
+Right Elbow Controller (ID: 34):
+	- Range is -0.25 to 1.6 
+
+
+March 3, 2017 by Rachel Haan
+- created initialze.sh ; this initilizes all motors to their starting postition.

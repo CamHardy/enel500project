@@ -1,0 +1,45 @@
+GENERAL USAGE:
+-Consult Video
+-roslaunch to launch the core processes
+-rostopic for motor manipulation and reading data
+-rosservice to call the speed service
+-Shoulder tips affected by the robot leaning forward; KEEP THE ROBOT UPRIGHT
+
+Head Motor (ID: 11):
+	-Range is 4.5 to 6.28
+	-(Any lower value than 4.5 causes the motors to default to a limit)
+	-(Any higher value than 6.28 causes the motor to default to the other limit)
+
+Neck Motor (ID: 12):
+	-Range is 0 to 3.1
+	-Same behavior as above
+	-center (looking straight forward) is 1.57
+	-looking right is 0, looking left is 3.1
+
+Left Shoulder Tip Controller (ID: 21):
+	-Range is 1.75 to 2.8
+
+Left Shoulder Controller (ID: 22):
+	-Range is -1.6 to 0.25  
+
+Left Upper Arm Controller (ID: 23):
+	- Range is -1.7 to 1.5
+	- IMPORTANT: MAKE SURE THE INITIAL POSITION IS AROUND 0!!!!! (resting is -.05 ish)
+	- You can check with rostopic echo /left_upper_arm_controller/state or just publish the topic to initialize it back to 0 if you think its not in range
+
+Left Elbow Controller (ID: 24):
+	-Range is -0.3 to 2
+
+Right Shoulder Tip Controller (ID: 31):
+	-Range is 0 to 1.2
+
+Right Shoulder Controller (ID: 32):
+	-Range is 0 to 1.5
+	-This causes the robot to tilt over, be careful!
+
+Right Upper Arm Controller (ID: 33): 
+	-Range is -1.6 to 1.6
+	-Init is around -0.1 (0 is okay)
+
+Right Elbow Controller (ID: 34):
+	- Range is -0.25 to 1.6 
