@@ -1,0 +1,70 @@
+<!-- Start tilt joint controller -->
+<launch>
+    <rosparam file="$(find capstone_test)/tilt.yaml" command="load"/>
+    <node name="controller_spawner" pkg="dynamixel_controllers" type="controller_spawner.py"
+        args="--manager=dxl_manager 
+            --port pan_tilt_port
+            head_controller
+            neck_controller
+            left_shoulder_tip_controller
+            left_shoulder_controller
+            left_upper_arm_controller
+            left_elbow_controller
+            right_shoulder_tip_controller
+            right_shoulder_controller
+            right_upper_arm_controller
+            right_elbow_controller"
+            output="screen"/>
+
+    <!-- Start initialization controller -->
+    <rosparam file="$(find capstone_test)/initialization_controller.yaml" command="load"/>
+    <node name="controller_spawner_meta_init" pkg="dynamixel_controllers" type="controller_spawner.py"
+        args="--manager=dxl_manager
+            --type=meta
+            initialization_controller
+            head_controller
+            neck_controller
+            left_shoulder_tip_controller
+            left_shoulder_controller
+            left_upper_arm_controller
+            left_elbow_controller
+            right_shoulder_tip_controller
+            right_shoulder_controller
+            right_upper_arm_controller
+            right_elbow_controller"
+            output="screen"/>
+
+    <!-- Start camera controller -->
+    <rosparam file="$(find capstone_test)/camera_controller.yaml" command="load"/>
+    <node name="controller_spawner_meta_camera" pkg="dynamixel_controllers" type="controller_spawner.py"
+        args="--manager=dxl_manager
+            --type=meta
+            camera_controller
+            head_controller
+            neck_controller"
+	    output="screen"/>
+
+    <!-- Start left arm trajectory controller -->
+    <rosparam file="$(find capstone_test)/left_arm_trajectory_controller.yaml" command="load"/>
+    <node name="controller_spawner_meta_left" pkg="dynamixel_controllers" type="controller_spawner.py"
+        args="--manager=dxl_manager
+            --type=meta
+            l_arm_controller
+            left_shoulder_tip_controller
+            left_shoulder_controller
+            left_upper_arm_controller
+            left_elbow_controller"
+            output="screen"/>
+
+    <!-- Start right arm trajectory controller -->
+    <rosparam file="$(find capstone_test)/right_arm_trajectory_controller.yaml" command="load"/>
+    <node name="controller_spawner_meta_right" pkg="dynamixel_controllers" type="controller_spawner.py"
+        args="--manager=dxl_manager
+            --type=meta
+            r_arm_controller
+            right_shoulder_tip_controller
+            right_shoulder_controller
+            right_upper_arm_controller
+            right_elbow_controller"
+            output="screen"/>
+</launch>
