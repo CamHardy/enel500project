@@ -1,22 +1,7 @@
 #!/usr/bin/env python
 import roslib
 import sys
-roslib.load_manifest('capstone_test')
-
-import rospy
-import actionlib
-from std_msgs.msg import Float64
-import trajectory_msgs.msg 
-import control_msgs.msg  
-from std_msgs.msg import String
-from trajectory_msgs.msg import JointTrajectoryPoint
-from control_msgs.msg import JointTrajectoryAction, JointTrajectoryGoal, FollowJointTrajectoryAction, FollowJointTrajectoryGoal
-from dynamixel_controllers.srv import *
-
-#!/usr/bin/env python
-import roslib
-import sys
-roslib.load_manifest('capstone_test')
+roslib.load_manifest('motion')
 
 import rospy
 import actionlib

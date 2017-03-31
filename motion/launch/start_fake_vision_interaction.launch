@@ -1,0 +1,4 @@
+<!-- Start Intermediate Node -->
+<launch>
+    <node name="intermediate" pkg="motion" type="intermediate" respawn="true"/>
+</launch>

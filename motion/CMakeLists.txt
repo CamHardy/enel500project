@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(capstone_test)
+project(motion)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  message_generation
+  robot_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -46,12 +46,9 @@ find_package(PythonLibs REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-   CommandID.msg
-   ObjectOfInterestPosition.msg
-   VisionCommand.msg
- )
+ #add_message_files(
+  # FILES
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -68,10 +65,10 @@ find_package(PythonLibs REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs
- )
+ #generate_messages(
+  # DEPENDENCIES
+  # std_msgs
+ #)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -125,7 +122,7 @@ include_directories(
 add_executable(intermediate src/intermediate.cpp)
 target_link_libraries(intermediate ${catkin_LIBRARIES})
 target_link_libraries(intermediate ${PYTHON_LIBRARIES})
-add_dependencies(intermediate capstone_test_generate_messages_cpp)
+add_dependencies(intermediate motion_generate_messages_cpp)
 
 ## Declare a C++ library
 # add_library(capstone_test
